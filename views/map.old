@@ -1,0 +1,30 @@
+extends layout
+block content
+    #map
+    script.
+        var myData = !{JSON.stringify(jsonData)};
+        // Create variable to hold map element, give initial settings to map
+        var map = L.map('map',{ center: [15, 100], zoom: 6});
+        var markerIcon = L.icon({
+            iconUrl: '/images/marker.svg',
+            iconSize: [30, 30], // size of the icon
+        });
+
+        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+               attribution: '©OpenStreetMap Powered by INO,NECTEC'
+        }).addTo(map);
+
+        console.log(myData);
+        // Add JSON to map
+        L.geoJson(myData,{
+          pointToLayer: function(feature, latlng) {
+          console.log(latlng, feature);
+          return L.marker(latlng, {
+            icon: markerIcon
+          });
+        },
+        onEachFeature: function (feature, layer) {
+           layer.bindPopup('Station: '+feature.properties.f2+'<br/>Temperature:'+feature.properties.f3);
+        }
+      }).addTo(map);
+

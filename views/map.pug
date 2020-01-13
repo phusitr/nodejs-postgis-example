@@ -1,0 +1,90 @@
+extends layout
+block content
+    #map
+    script.
+        var myData = !{JSON.stringify(jsonData)};
+        var Attr = 'Map Engine by  INO,NECTEC';
+
+        // Tile type: openstreetmap normal
+        var openstreetmap = L.tileLayer(
+             'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+             attribution: Attr,
+             maxZoom: 17 
+        })
+
+        var arcgismap = L.tileLayer(
+             'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+             attribution: Attr,
+             maxZoom: 17
+        })
+
+        var cartodb = L.tileLayer(
+             'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+             attribution: Attr,
+             maxZoom: 17
+        })
+
+        var opentopomap = L.tileLayer(
+             'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+             attribution: Attr,
+             maxZoom: 17
+        })
+
+        var hydda = L.tileLayer(
+             'https://{s}.tile.openstreetmap.se/hydda/base/{z}/{x}/{y}.png', {
+             attribution: Attr,
+             maxZoom: 17
+        })
+
+        var esridelorme = L.tileLayer(
+             'https://server.arcgisonline.com/ArcGIS/rest/services/Specialty/DeLorme_World_Base_Map/MapServer/tile/{z}/{y}/{x}', {
+             attribution: Attr,
+             maxZoom: 17
+        })
+
+        var esridark = L.tileLayer(
+             'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+             attribution: Attr,
+             maxZoom: 17
+        })
+
+        // Create variable to hold map element, give initial settings to map
+        var map = L.map('map',{ center: [15, 100], zoom: 6});
+        var markerIcon = L.icon({
+            iconUrl: '/images/marker.svg',
+            iconSize: [18, 18], // size of the icon
+        });
+
+        //Base layers definition and addition
+        var baseLayers = {
+            "OSM": openstreetmap,
+            "ArcGIS": arcgismap,
+            "CartoDB": cartodb,
+            "OpenTopoMap":opentopomap,
+            "Hydda":hydda,
+            "Esri Delorme":esridelorme,
+            "Esri Dark":esridark
+        };
+
+        openstreetmap.addTo(map);
+
+        //L.tileLayer(osmMap, {
+        //       attribution: mbAttr 
+        //}).addTo(map);
+
+        console.log(myData);
+
+        // Add JSON to map
+        L.geoJson(myData,{
+          pointToLayer: function(feature, latlng) {
+          console.log(latlng, feature);
+          return L.marker(latlng, {
+            icon: markerIcon
+          });
+        },
+        onEachFeature: function (feature, layer) {
+           layer.bindPopup('Station: '+feature.properties.f2+'<br/>Temperature:'+feature.properties.f3);
+         }
+        }).addTo(map);
+
+        L.control.layers(baseLayers).addTo(map);
